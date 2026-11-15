@@ -1,0 +1,22 @@
+name: Apple
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ios:
+    name: iOS IPA (unsigned)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install deps
+        run: brew install xcodegen
+      - name: Build IPA
+        run: |
+          chmod +x apple/ios/build_ios_ipa.sh
+          ./apple/ios/build_ios_ipa.sh
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: XCL-ios-ipa
+          path: apple/ios/build/XCL.ipa
