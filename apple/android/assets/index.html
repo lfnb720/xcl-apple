@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>XCL 手机版</title>
+<style>
+  :root{
+    --accent:#6c5ce7; --accent2:#8b7cff; --soft:#f1f0fe;
+    --ink:#1f2328; --sub:#8a8f98; --line:#eceef2; --bg:#ffffff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{max-width:100%;overflow-x:hidden}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.65;padding-bottom:28px;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{padding:0 18px;max-width:620px;margin:0 auto;width:100%}
+
+  header{
+    padding:16px 0 10px;display:flex;align-items:center;gap:10px;
+  }
+  .logo{
+    width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--accent2),#5a4bd4);color:#fff;font-weight:800;
+    box-shadow:0 6px 14px rgba(108,92,231,.3);
+  }
+  .brand{font-weight:700;font-size:15px}
+  .brand small{display:block;font-size:10.5px;color:var(--sub);font-weight:400}
+  .badge{
+    margin-left:auto;font-size:11px;color:#5b51c9;background:var(--soft);
+    border:1px solid #e2ddfb;border-radius:999px;padding:4px 10px;
+  }
+
+  .hero{padding:14px 0 4px}
+  .hero h1{font-size:26px;line-height:1.3;letter-spacing:-.3px}
+  .hero h1 em{font-style:normal;color:var(--accent)}
+  .hero p{color:#6b7079;font-size:13.5px;margin-top:10px}
+
+  .notice{
+    margin-top:14px;display:flex;gap:10px;padding:13px 14px;border-radius:14px;
+    background:#fffbf0;border:1px solid #f6e7c8;font-size:12.5px;color:#8a6d2f;
+  }
+  .notice b{color:#7a5a1d}
+
+  section{margin-top:26px}
+  .sec-title{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:1px;margin-bottom:10px}
+  .list{display:flex;flex-direction:column;gap:9px}
+  .row>div{min-width:0}
+  .row{
+    display:flex;gap:12px;align-items:flex-start;padding:13px 14px;
+    border:1px solid var(--line);border-radius:14px;background:#fff;
+  }
+  .row .ico{width:34px;height:34px;flex:none;border-radius:10px;background:var(--soft);
+    display:grid;place-items:center;font-size:16px}
+  .row h3{font-size:14px;margin-bottom:2px}
+  .row p{font-size:12px;color:#6b7079;line-height:1.6}
+
+  .links{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .link{min-width:0;overflow:hidden}
+    display:flex;align-items:center;gap:8px;padding:12px 13px;border-radius:13px;
+    border:1px solid var(--line);background:#fff;font-size:13px;
+  }
+  .link span{font-size:15px}
+  .link:active{background:var(--soft);border-color:#d9d3fb}
+
+  .card{
+    margin-top:10px;padding:16px;border-radius:16px;border:1px solid #e9e5fd;
+    background:linear-gradient(160deg,#f7f5ff,#ffffff);
+  }
+  .card h3{font-size:14.5px;margin-bottom:6px}
+  .card p{font-size:12.5px;color:#6b7079}
+  .kv{display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .kv:last-child{border-bottom:none}
+  .kv span:first-child{color:var(--sub)}
+
+  .play{margin-top:10px;padding:16px;border:1px solid #e9e5fd;border-radius:16px;background:linear-gradient(160deg,#f7f5ff,#ffffff)}
+  .btn-play{width:100%;padding:13px;border:none;border-radius:12px;background:var(--accent);color:#fff;
+    font-size:14.5px;font-weight:600;box-shadow:0 10px 22px rgba(108,92,231,.25)}
+  .btn-play:active{background:#5a4bd4}
+  .play-msg{margin-top:10px;font-size:12.5px;color:#6b7079;text-align:center}
+  .play-note{margin-top:8px;font-size:11.5px;color:#9aa0a8;line-height:1.7}
+
+  footer{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:11px;color:#a0a5ad;text-align:center;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">X</div>
+    <div class="brand">XCL<small>手机版 · 功能与资源</small></div>
+    <div class="badge">Android</div>
+  </header>
+
+  <div class="hero">
+    <h1>XCL，<em>装好、修好、玩好</em><br>Minecraft 的那一个启动器</h1>
+    <p>电脑端负责下载、启动与联机；手机端用于随时查看功能、查资料、找 Mod 与资源。</p>
+
+    <div class="notice">
+      <span>💡</span>
+      <div><b>请留意：</b>Java 版 Minecraft 需要 JVM 与图形转译层，手机端不内置；可用下方「一键启动」拉起已装的 FCL / Pojav。</div>
+    </div>
+  </div>
+
+  <section>
+    <div class="sec-title">启动 Minecraft</div>
+    <div class="play">
+      <button id="playBtn" class="btn-play">一键启动（需已安装 FCL / Pojav）</button>
+      <p id="playMsg" class="play-msg">正在检测已安装的启动器…</p>
+      <p id="nativeInfo" class="play-msg" style="color:#9aa0a8;font-size:11px"></p>
+      <p id="jvmInfo" class="play-msg" style="color:#9aa0a8;font-size:11px"></p>
+      <p id="glInfo" class="play-msg" style="color:#9aa0a8;font-size:11px"></p>
+      <p id="eglInfo" class="play-msg" style="color:#9aa0a8;font-size:11px"></p>
+      <p id="runtimeInfo" class="play-msg" style="color:#9aa0a8;font-size:11px"></p>
+      <button id="msBtn" class="btn-play" style="margin-top:12px;background:#2f6fed;box-shadow:0 10px 22px rgba(47,111,237,.25)">微软正版登录</button>
+      <p id="msMsg" class="play-msg" style="color:#9aa0a8;font-size:11px"></p>
+      <button id="pipeBtn" class="btn-play" style="margin-top:10px;background:#2aa8a0;box-shadow:0 10px 22px rgba(42,168,160,.25)">运行启动流水线（示例版本）</button>
+      <button id="smokeBtn" class="btn-play" style="margin-top:10px;background:#8e44ad;box-shadow:0 10px 22px rgba(142,68,173,.25)">JVM 自检（创建 Java 虚拟机）</button>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <input id="verInput" value="1.20.1" style="flex:1;padding:10px 12px;border-radius:12px;border:1px solid #2a2f3a;background:#141821;color:#e8ecf4;font-size:13px" />
+        <button id="installBtn" class="btn-play" style="margin:0;padding:10px 14px;font-size:12px;background:#2f6fed">安装版本</button>
+        <button id="launchBtn" class="btn-play" style="margin:0;padding:10px 14px;font-size:12px;background:#27ae60">启动</button>
+      </div>      <button id="wizardBtn" class="btn-play" style="margin-top:10px;background:#c0392b;box-shadow:0 10px 22px rgba(192,57,43,.3)">一键启动向导（全检 → 安装 → 启动 → 日志）</button>
+      <button id="logBtn" class="btn-play" style="margin-top:10px;background:#636e72;box-shadow:0 10px 22px rgba(99,110,114,.25)">查看启动日志</button>
+      <button id="allBtn" class="btn-play" style="margin-top:10px;background:#1e272e;box-shadow:0 10px 22px rgba(30,39,46,.25)">一键全检（汇总报告）</button>
+      <button id="audioBtn" class="btn-play" style="margin-top:10px;background:#e17055;box-shadow:0 10px 22px rgba(225,112,85,.25)">音频自检（440Hz 提示音）</button>
+      <button id="sdlWinBtn" class="btn-play" style="margin-top:10px;background:#6c5ce7;box-shadow:0 10px 22px rgba(108,92,231,.25)">SDL3 窗口测试（创建窗口 + GL 上下文）</button>
+      <button id="sdlBtn" class="btn-play" style="margin-top:10px;background:#0984e3;box-shadow:0 10px 22px rgba(9,132,227,.25)">SDL3 探测（窗口/GL 入口）</button>
+      <button id="inputBtn" class="btn-play" style="margin-top:10px;background:#16a085;box-shadow:0 10px 22px rgba(22,160,133,.25)">输入统计（触摸/按键队列）</button>
+      <button id="winBtn" class="btn-play" style="margin-top:10px;background:#d35400;box-shadow:0 10px 22px rgba(211,84,0,.25)">显示 GL 窗口（测试屏幕输出）</button>
+      <button id="glBtn" class="btn-play" style="margin-top:10px;background:#2d3436;box-shadow:0 10px 22px rgba(45,52,54,.25)">图形自检（GL4ES 渲染）</button>
+      <pre id="pipeOut" style="display:none;margin-top:10px;padding:12px;border-radius:12px;background:#0f1115;color:#cfd4e0;font-size:11px;line-height:1.7;white-space:pre-wrap"></pre>
+      <p class="play-note">Java 版 Minecraft 需要 JVM 与图形转译层，XCL 手机版不内置这些组件。
+        若手机里已装 FCL / PojavLauncher / Zalith Launcher，可在上方按钮一键拉起，再到其中启动游戏。</p>
+      <div class="links" style="margin-top:12px">
+        <a class="link" href="https://github.com/FCL-Team/FoldCraftLauncher/releases"><span>📦</span>获取 FCL</a>
+        <a class="link" href="https://github.com/PojavLauncherTeam/PojavLauncher/releases"><span>📦</span>获取 Pojav</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">核心功能</div>
+    <div class="list">
+      <div class="row"><div class="ico">⬇️</div><div><h3>极速下载</h3><p>镜像加速 + 多线程 + SHA1 校验，断网重试也不会重复下载。</p></div></div>
+      <div class="row"><div class="ico">🧩</div><div><h3>四种加载器</h3><p>Vanilla / Fabric / Forge / NeoForge 自动安装，版本号自动匹配。</p></div></div>
+      <div class="row"><div class="ico">🛠️</div><div><h3>诊断与补全</h3><p>逐项检查 jar、库、资源索引，精确指出缺了哪个文件，一键补回。</p></div></div>
+      <div class="row"><div class="ico">🧑‍🎨</div><div><h3>3D 皮肤预览</h3><p>OpenGL 实时渲染，支持帽子与外套第二层，可拖拽旋转。</p></div></div>
+      <div class="row"><div class="ico">🌐</div><div><h3>一键联机</h3><p>基于 EasyTier 的虚拟局域网，填房间号即可加入。</p></div></div>
+      <div class="row"><div class="ico">🎨</div><div><h3>个性化</h3><p>浅色 / 深色 / 跟随系统，毛玻璃开关，侧栏宽度可调。</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">百宝袋 · 常用站点</div>
+    <div class="links">
+      <a class="link" href="https://www.mcmod.cn/"><span>📚</span>MC百科</a>
+      <a class="link" href="https://zh.minecraft.wiki/"><span>📖</span>Minecraft Wiki</a>
+      <a class="link" href="https://modrinth.com/"><span>🧩</span>Modrinth</a>
+      <a class="link" href="https://www.curseforge.com/minecraft"><span>🔥</span>CurseForge</a>
+      <a class="link" href="https://www.minecraft.net/zh-hans"><span>🌍</span>MC 官网</a>
+      <a class="link" href="https://www.planetminecraft.com/"><span>🏕</span>Planet Minecraft</a>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">电脑版</div>
+    <div class="card">
+      <h3>XCL 便携版</h3>
+      <p>解压到任意目录，双击 XCL.exe 即可运行，不写入系统目录，自带 Java 下载。</p>
+      <div class="kv"><span>运行平台</span><span>Windows 10 / 11 · x64</span></div>
+      <div class="kv"><span>体积</span><span>约 36 MB</span></div>
+      <div class="kv"><span>安装方式</span><span>免安装（解压即用）</span></div>
+    </div>
+  </section>
+
+  <footer>
+    XCL · Xray Craft Launcher<br>
+    界面与功能均为本项目自研实现 · 与 Mojang Studios 无隶属关系
+  </footer>
+
+</div>
+<script>
+(function () {
+  var btn = document.getElementById('playBtn');
+  var msg = document.getElementById('playMsg');
+  if (!btn || !msg) return;
+
+  function detect() {
+    if (!window.XCLBridge) { msg.textContent = '当前环境不支持检测'; return; }
+    try {
+      var p = window.XCLBridge.installedLauncher();
+      msg.textContent = p ? ('已检测到：' + p) : '未检测到 FCL / PojavLauncher / Zalith Launcher';
+    } catch (e) { msg.textContent = '检测失败'; }
+
+    var nat = document.getElementById('nativeInfo');
+    if (nat && window.XCLBridge.nativeInfo) {
+      try {
+        var info = window.XCLBridge.nativeInfo();
+        if (info) nat.textContent = '原生层：' + info;
+      } catch (e) { }
+    }
+
+    var jvm = document.getElementById('jvmInfo');
+    if (jvm && window.XCLBridge.jvmStatus) {
+      try {
+        var raw = window.XCLBridge.jvmStatus();
+        var o = JSON.parse(raw);
+        if (o && o.probe && o.probe.found) {
+          jvm.textContent = '运行层：JRE 已就位 (' + o.probe.libjvm + ')';
+        } else {
+          jvm.textContent = '运行层：尚未安装 JRE（' + (o && o.jre ? o.jre : '路径未知') + '）';
+        }
+      } catch (e) { }
+    }
+
+    var gl = document.getElementById('glInfo');
+    if (gl && window.XCLBridge.glStatus) {
+      try {
+        var g = JSON.parse(window.XCLBridge.glStatus());
+        if (g && g.loaded) {
+          gl.textContent = '图形层：GL4ES 已加载（glClear ' + (g.glClear ? '✓' : '✗')
+            + ' / glDrawArrays ' + (g.glDrawArrays ? '✓' : '✗') + '）';
+        } else {
+          gl.textContent = '图形层：GL4ES 未加载';
+        }
+      } catch (e) { }
+    }
+
+    var egl = document.getElementById('eglInfo');
+    if (egl && window.XCLBridge.eglStatus) {
+      try {
+        var e2 = JSON.parse(window.XCLBridge.eglStatus());
+        if (e2 && e2.ok) {
+          egl.textContent = '图形上下文：已创建（' + (e2.version || 'GLES') + '）'
+            + (e2.gl4es ? ' · GL4ES: ' + e2.gl4es : ' · GL4ES 未就绪')
+            + (e2.render ? ' · 渲染: ' + e2.render : '');
+        } else {
+          egl.textContent = '图形上下文：当前设备未就绪';
+        }
+      } catch (e) { }
+    }
+
+    var rt = document.getElementById('runtimeInfo');
+    if (rt && window.XCLBridge.runtimeStatus) {
+      try {
+        var r2 = JSON.parse(window.XCLBridge.runtimeStatus());
+        rt.textContent = '输入层：' + (r2.input ? '就绪' : '未就绪')
+          + ' · 音频层：' + (r2.openal ? '就绪' : '未就绪');
+      } catch (e) { }
+    }
+
+    var msBtn = document.getElementById('msBtn');
+    var msMsg = document.getElementById('msMsg');
+    var msTimer = null;
+    if (msBtn && window.XCLBridge && window.XCLBridge.msDeviceCode) {
+      msBtn.addEventListener('click', function () {
+        msMsg.textContent = '正在申请设备码…';
+        try {
+          var dc = JSON.parse(window.XCLBridge.msDeviceCode());
+          if (!dc.ok) { msMsg.textContent = '申请失败：' + (dc.error || ''); return; }
+          msMsg.innerHTML = '请在浏览器打开 <b>' + dc.uri + '</b> 并输入代码 <b>' + dc.userCode + '</b>（页面会自动轮询）';
+          if (msTimer) clearInterval(msTimer);
+          var deadline = Date.now() + 120000;
+          msTimer = setInterval(function () {
+            if (Date.now() > deadline) { clearInterval(msTimer); msMsg.textContent = '已超时，请重试'; return; }
+            try {
+              var st = JSON.parse(window.XCLBridge.msPoll());
+              if (st.status === 'ok') {
+                clearInterval(msTimer);
+                msMsg.textContent = '登录成功：' + st.name + '（' + st.uuid + '）';
+              } else if (st.status === 'error') {
+                clearInterval(msTimer);
+                msMsg.textContent = '登录失败：' + (st.error || '');
+              }
+            } catch (e) { }
+          }, 3000);
+        } catch (e) { msMsg.textContent = '申请异常：' + e; }
+      });
+    }
+  }
+
+  btn.addEventListener('click', function () {
+    if (!window.XCLBridge) { msg.textContent = '当前环境不支持'; return; }
+    try {
+      var r = window.XCLBridge.launchGame();
+      if (r && r.indexOf('ok:') === 0) {
+        msg.textContent = '已打开 ' + r.substring(3) + '，请在其中启动游戏';
+      } else {
+        msg.textContent = '未检测到可用启动器，请先安装（见下方链接）';
+      }
+    } catch (e) { msg.textContent = '启动失败：' + e; }
+  });
+
+  var pipeBtn = document.getElementById('pipeBtn');
+  var pipeOut = document.getElementById('pipeOut');
+  if (pipeBtn && pipeOut && window.XCLBridge && window.XCLBridge.pipelinePreview) {
+    pipeBtn.addEventListener('click', function () {
+      pipeOut.style.display = 'block';
+      pipeOut.textContent = '正在运行…';
+      try {
+        var r = JSON.parse(window.XCLBridge.pipelinePreview());
+        if (r.error) { pipeOut.textContent = '失败：' + r.error; return; }
+        var lines = ['结果：' + (r.ready ? '就绪' : '未就绪')];
+        for (var i = 0; i < r.steps.length; i++) lines.push((i + 1) + '. ' + r.steps[i]);
+        pipeOut.textContent = lines.join('\n');
+      } catch (e) { pipeOut.textContent = '异常：' + e; }
+    });
+  }
+  var smokeBtn = document.getElementById('smokeBtn');
+  if (smokeBtn && window.XCLBridge && window.XCLBridge.jvmSmoke) {
+    smokeBtn.addEventListener('click', function () {
+      var out = document.getElementById('pipeOut');
+      out.style.display = 'block';
+      out.textContent = '正在解压 JRE 并创建虚拟机…（首次约需 10-30 秒）';
+      setTimeout(function () {
+        try {
+          var r = JSON.parse(window.XCLBridge.jvmSmoke());
+          var lines = [];
+          lines.push('结果：' + (r.ok ? 'JVM 创建成功' : '失败'));
+          if (r.rc) lines.push('返回：' + r.rc);
+          if (r.integrity) lines.push('完整性：' + r.integrity);
+          if (r.libjvm) lines.push('libjvm：' + r.libjvm);
+          if (r.output) lines.push('--- Java 输出 ---\n' + r.output);
+          if (r.error) lines.push('错误：' + r.error);
+          if (r.log) lines.push('--- 日志 ---\n' + r.log);
+          out.textContent = lines.join('\n');
+        } catch (e) { out.textContent = '异常：' + e; }
+      }, 50);
+    });
+  }
+  var glBtn = document.getElementById('glBtn');
+  if (glBtn && window.XCLBridge && window.XCLBridge.glSelfTest) {
+    glBtn.addEventListener('click', function () {
+      var out = document.getElementById('pipeOut');
+      out.style.display = 'block';
+      out.textContent = '正在创建上下文并渲染…';
+      setTimeout(function () {
+        try {
+          var r = JSON.parse(window.XCLBridge.glSelfTest());
+          out.textContent = r.ok
+            ? ('图形链路通\n结果：' + r.result)
+            : ('图形自检失败：' + (r.error || r.result || ''));
+        } catch (e) { out.textContent = '异常：' + e; }
+      }, 30);
+    });
+  }
+  var installBtn = document.getElementById('installBtn');
+  var launchBtn = document.getElementById('launchBtn');
+  var verInput = document.getElementById('verInput');
+  var jobTimer = null;
+  if (installBtn && window.XCLBridge && window.XCLBridge.installVersion) {
+    installBtn.addEventListener('click', function () {
+      var out = document.getElementById('pipeOut');
+      out.style.display = 'block';
+      out.textContent = '正在获取版本清单…';
+      try { window.XCLBridge.installVersion(verInput.value.trim()); } catch (e) { out.textContent = '异常：' + e; return; }
+      if (jobTimer) clearInterval(jobTimer);
+      jobTimer = setInterval(function () {
+        try {
+          var s = JSON.parse(window.XCLBridge.installStatus());
+          out.textContent = '[' + s.state + '] ' + s.message + '\n进度：' + s.done + '/' + s.total + ' · ' + s.mb + ' MB';
+          if (s.state === 'done' || s.state === 'error') clearInterval(jobTimer);
+        } catch (e) { clearInterval(jobTimer); }
+      }, 800);
+    });
+    launchBtn.addEventListener('click', function () {
+      var out = document.getElementById('pipeOut');
+      out.style.display = 'block';
+      out.textContent = '正在启动…（首次可能需要下载资源）';
+      setTimeout(function () {
+        try {
+          var r = JSON.parse(window.XCLBridge.launchVersion(verInput.value.trim(), 'Steve'));
+          out.textContent = r.ok ? ('启动成功\n' + (r.log || '')) : ('启动失败：' + (r.error || r.rc || ''));
+        } catch (e) { out.textContent = '异常：' + e; }
+      }, 30);
+    });
+  }
+  var winBtn = document.getElementById('winBtn');
+  if (winBtn && window.XCLBridge && window.XCLBridge.showGlWindow) {
+    winBtn.addEventListener('click', function () {
+      try { window.XCLBridge.showGlWindow(true); } catch (e) { alert('异常：' + e); return; }
+      setTimeout(function () {
+        try {
+          var r = JSON.parse(window.XCLBridge.windowStatus());
+          alert('窗口状态：' + r.status + '\n上次结果：' + r.last + '\n\n屏幕应显示浅蓝色（按返回键恢复页面）');
+        } catch (e) { alert('状态查询失败：' + e); }
+      }, 1200);
+    });
+  }
+  var inputBtn = document.getElementById('inputBtn');
+  if (inputBtn && window.XCLBridge && window.XCLBridge.inputStats) {
+    inputBtn.addEventListener('click', function () {
+      try {
+        var r = JSON.parse(window.XCLBridge.inputStats());
+        var out = document.getElementById('pipeOut');
+        out.style.display = 'block';
+        out.textContent = '输入队列事件数：' + r.count + (r.drain ? ('\n最近事件：\n' + r.drain) : '');
+      } catch (e) { alert('查询失败：' + e); }
+    });
+  }
+  var sdlBtn = document.getElementById('sdlBtn');
+  if (sdlBtn && window.XCLBridge && window.XCLBridge.sdlStatus) {
+    sdlBtn.addEventListener('click', function () {
+      try {
+        var r = JSON.parse(window.XCLBridge.sdlStatus());
+        var out = document.getElementById('pipeOut');
+        out.style.display = 'block';
+        out.textContent = 'SDL3：' + r.result;
+      } catch (e) { alert('探测失败：' + e); }
+    });
+  }
+  var sdlWinBtn = document.getElementById('sdlWinBtn');
+  if (sdlWinBtn && window.XCLBridge && window.XCLBridge.sdlWindow) {
+    sdlWinBtn.addEventListener('click', function () {
+      try {
+        var r = JSON.parse(window.XCLBridge.sdlWindow());
+        var out = document.getElementById('pipeOut');
+        out.style.display = 'block';
+        out.textContent = 'SDL3 窗口：' + r.result;
+      } catch (e) { alert('测试失败：' + e); }
+    });
+  }
+  var audioBtn = document.getElementById('audioBtn');
+  if (audioBtn && window.XCLBridge && window.XCLBridge.audioSelfTest) {
+    audioBtn.addEventListener('click', function () {
+      try {
+        var r = JSON.parse(window.XCLBridge.audioSelfTest());
+        var out = document.getElementById('pipeOut');
+        out.style.display = 'block';
+        out.textContent = '音频：' + r.result;
+      } catch (e) { alert('音频测试失败：' + e); }
+    });
+  }
+  var allBtn = document.getElementById('allBtn');
+  if (allBtn && window.XCLBridge && window.XCLBridge.fullSelfTest) {
+    allBtn.addEventListener('click', function () {
+      var out = document.getElementById('pipeOut');
+      out.style.display = 'block';
+      out.textContent = '正在全检（约 2-5 秒）…';
+      setTimeout(function () {
+        try {
+          var r = JSON.parse(window.XCLBridge.fullSelfTest());
+          var lines = [];
+          for (var i = 0; i < r.items.length; i++) {
+            lines.push('[' + r.items[i].name + '] ' + r.items[i].result);
+          }
+          lines.push('');
+          lines.push('报告已保存到 filesDir/last_selftest.txt');
+          out.textContent = lines.join('\n');
+        } catch (e) { out.textContent = '全检失败：' + e; }
+      }, 50);
+    });
+  }
+  var logBtn = document.getElementById('logBtn');
+  if (logBtn && window.XCLBridge && window.XCLBridge.launchLog) {
+    logBtn.addEventListener('click', function () {
+      try {
+        var r = JSON.parse(window.XCLBridge.launchLog());
+        var out = document.getElementById('pipeOut');
+        out.style.display = 'block';
+        out.textContent = r.text || '(空)';
+      } catch (e) { alert('读取失败：' + e); }
+    });
+  }
+  var wizardBtn = document.getElementById('wizardBtn');
+  if (wizardBtn && window.XCLBridge && window.XCLBridge.fullSelfTest) {
+    wizardBtn.addEventListener('click', function () {
+      var out = document.getElementById('pipeOut');
+      out.style.display = 'block';
+      out.textContent = '【1/4】全检…';
+      setTimeout(function () {
+        var prefix = '';
+        try {
+          var r = JSON.parse(window.XCLBridge.fullSelfTest());
+          prefix = '【1/4】全检完成：\n';
+          for (var i = 0; i < r.items.length; i++) {
+            prefix += '  [' + r.items[i].name + '] ' + r.items[i].result + '\n';
+          }
+        } catch (e) { prefix = '【1/4】全检异常：' + e + '\n'; }
+        var ver = (document.getElementById('verInput') || {}).value || '1.20.1';
+        out.textContent = prefix + '\n【2/4】开始安装 ' + ver + ' …';
+        try { window.XCLBridge.installVersion(ver); } catch (e) { out.textContent = prefix + '\n安装失败：' + e; return; }
+        var timer = setInterval(function () {
+          var s;
+          try { s = JSON.parse(window.XCLBridge.installStatus()); } catch (e) { clearInterval(timer); return; }
+          out.textContent = prefix + '\n【2/4】安装：' + s.state + ' · ' + s.message + ' (' + s.done + '/' + s.total + ', ' + s.mb + ' MB)';
+          if (s.state === 'done') {
+            clearInterval(timer);
+            out.textContent = prefix + '\n【2/4】安装完成\n【3/4】启动中…';
+            setTimeout(function () {
+              var launched = '';
+              try {
+                var lr = JSON.parse(window.XCLBridge.launchVersion(ver, 'Steve'));
+                launched = lr.ok ? ('启动返回：' + (lr.rc || 'ok')) : ('启动失败：' + (lr.error || lr.rc || ''));
+              } catch (e) { launched = '启动异常：' + e; }
+              var logText = '';
+              try {
+                var lg = JSON.parse(window.XCLBridge.launchLog());
+                logText = lg.text || '';
+              } catch (e) { logText = '日志读取失败：' + e; }
+              out.textContent = prefix + '\n【2/4】安装完成\n【3/4】' + launched + '\n\n【4/4】启动日志：\n' + logText;
+            }, 200);
+          } else if (s.state === 'error') {
+            clearInterval(timer);
+            out.textContent = prefix + '\n【2/4】安装失败：' + s.message;
+          }
+        }, 900);
+      }, 50);
+    });
+  }
+  setTimeout(detect, 120);
+})();
+</script>
+</body>
+</html>
