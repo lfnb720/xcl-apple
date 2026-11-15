@@ -10,7 +10,7 @@ workflows:
         script: brew install xcodegen
       - name: Build unsigned IPA
         script: |
-          cd apple/ios
-          ./build_ios_ipa.sh
+          chmod +x apple/ios/build_ios_ipa.sh
+          bash apple/ios/build_ios_ipa.sh
     artifacts:
       - apple/ios/build/XCL.ipa
