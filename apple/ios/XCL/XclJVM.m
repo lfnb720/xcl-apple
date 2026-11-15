@@ -94,11 +94,16 @@ static int createJVM(NSString* jreHome, NSArray<NSString*>* options)
 static NSString* runMain(NSString* mainClass, NSArray<NSString*>* args)
 {
     if (g_vm == NULL) return @"JVM 未创建";
-    JNIEnv* env = g_env;
-    if (env == NULL && (*g_vm)->GetEnv(g_vm, (void**)&env, JNI_VERSION_1_8) != JNI_OK) {
-        env = NULL;
+    // env 属于线程: 每次调用都要确认当前线程是否已附着到 JVM
+    JNIEnv* env = NULL;
+    BOOL attached = NO;
+    jint gres = (*g_vm)->GetEnv(g_vm, (void**)&env, JNI_VERSION_1_8);
+    if (gres == JNI_EDETACHED || env == NULL) {
+        if ((*g_vm)->AttachCurrentThread(g_vm, (void**)&env, NULL) != JNI_OK || env == NULL) {
+            return @"JVM 线程附着失败";
+        }
+        attached = YES;
     }
-    if (env == NULL) return @"JVM 环境获取失败";
     // JNI 的 FindClass 需要斜杠分隔 (com/xcl/smoke/Smoke), 不能直接用点
     NSString* slashName = [mainClass stringByReplacingOccurrencesOfString:@"." withString:@"/"];
     jclass cls = (*env)->FindClass(env, slashName.UTF8String);
@@ -136,11 +141,13 @@ static NSString* runMain(NSString* mainClass, NSArray<NSString*>* args)
         (*env)->DeleteLocalRef(env, s);
     }
     (*env)->CallStaticVoidMethod(env, cls, mid, arr);
-    if ((*env)->ExceptionCheck(env)) {
+    jboolean hadException = (*env)->ExceptionCheck(env);
+    if (hadException) {
         (*env)->ExceptionDescribe(env);
         (*env)->ExceptionClear(env);
-        return @"main 执行抛出异常";
     }
+    if (attached) (*g_vm)->DetachCurrentThread(g_vm);
+    if (hadException) return @"main 执行抛出异常";
     return @"ok";
 }
 
