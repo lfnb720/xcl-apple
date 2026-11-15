@@ -96,11 +96,31 @@ static NSString* runMain(NSString* mainClass, NSArray<NSString*>* args)
     if ((*g_vm)->GetEnv(g_vm, (void**)&env, JNI_VERSION_1_8) != JNI_OK || env == NULL) {
         return @"JVM 环境获取失败";
     }
-    jclass cls = (*env)->FindClass(env, mainClass.UTF8String);
+    // JNI 的 FindClass 需要斜杠分隔 (com/xcl/smoke/Smoke), 不能直接用点
+    NSString* slashName = [mainClass stringByReplacingOccurrencesOfString:@"." withString:@"/"];
+    jclass cls = (*env)->FindClass(env, slashName.UTF8String);
     if (cls == NULL) {
         (*env)->ExceptionDescribe(env);
         (*env)->ExceptionClear(env);
-        return [NSString stringWithFormat:@"找不到类: %@", mainClass];
+        // 附带 classpath 与 jar 存在性, 便于定位
+        NSString* cp = @"(unknown)";
+        jstring cpStr = NULL;
+        jclass sysCls = (*env)->FindClass(env, "java/lang/System");
+        if (sysCls != NULL) {
+            jmethodID getProp = (*env)->GetStaticMethodID(env, sysCls, "getProperty",
+                                                          "(Ljava/lang/String;)Ljava/lang/String;");
+            if (getProp != NULL) {
+                jstring key = (*env)->NewStringUTF(env, "java.class.path");
+                cpStr = (jstring)(*env)->CallStaticObjectMethod(env, sysCls, getProp, key);
+                if (cpStr != NULL) {
+                    const char* c = (*env)->GetStringUTFChars(env, cpStr, NULL);
+                    if (c != NULL) { cp = [NSString stringWithUTF8String:c]; (*env)->ReleaseStringUTFChars(env, cpStr, c); }
+                }
+                (*env)->DeleteLocalRef(env, key);
+                (*env)->ExceptionClear(env);
+            }
+        }
+        return [NSString stringWithFormat:@"找不到类: %@ (斜杠形式: %@)\nclasspath=%@", mainClass, slashName, cp];
     }
     jmethodID mid = (*env)->GetStaticMethodID(env, cls, "main", "([Ljava/lang/String;)V");
     if (mid == NULL) return @"找不到 main(String[])";

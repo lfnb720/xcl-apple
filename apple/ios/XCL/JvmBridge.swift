@@ -43,6 +43,12 @@ final class JvmRuntime {
             return "缺少 iOS JRE（构建脚本未打包）"
         }
 
+        let jarExists = fm.fileExists(atPath: smokeJar)
+        add("[iOS] smoke.jar 存在: \(jarExists)")
+        if !jarExists {
+            add("[错误] App 包里没有 smoke.jar —— 资源没打包进去")
+        }
+
         let outFile = tmpDir + "/smoke.txt"
         let opts = [
             "-Djava.home=\(jreHome)",
