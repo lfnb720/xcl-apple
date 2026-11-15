@@ -11,9 +11,12 @@ targets:
     platform: iOS
     sources:
       - path: XCL
-      - path: Resources
+      # JRE 与冒烟 jar 作为文件夹/文件资源打进 App 根目录
+      - path: Resources/jre8
+        type: folder
         buildPhase: resources
-        optional: true
+      - path: Resources/smoke.jar
+        buildPhase: resources
     info:
       path: XCL/Info.plist
       properties:
@@ -21,22 +24,25 @@ targets:
         CFBundleShortVersionString: "1.0"
         CFBundleVersion: "1"
         UILaunchScreen: {}
+        UIRequiresFullScreen: true
+        UIStatusBarHidden: true
+        UIViewControllerBasedStatusBarAppearance: false
         UISupportedInterfaceOrientations:
-          - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
         UISupportedInterfaceOrientations~ipad:
-          - UIInterfaceOrientationPortrait
-          - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
-        UIRequiresFullScreen: false
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.xcl.app.ios
         TARGETED_DEVICE_FAMILY: "1,2"
         SWIFT_VERSION: "5.0"
+        SWIFT_OBJC_BRIDGING_HEADER: XCL/XCL-Bridging-Header.h
+        HEADER_SEARCH_PATHS: "$(SRCROOT)/XCL/include"
+        CLANG_ENABLE_OBJC_ARC: YES
         CODE_SIGNING_ALLOWED: NO
         ENABLE_BITCODE: NO
+        OTHER_LDFLAGS: "-Wl,-pagezero_size,0x1000 -Wl,-rpath,@executable_path/jre8/lib -Wl,-rpath,@executable_path/jre8/lib/server"
