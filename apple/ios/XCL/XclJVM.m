@@ -18,6 +18,7 @@
 typedef jint (*CreateJavaVMFn)(JavaVM**, void**, void*);
 
 static JavaVM* g_vm = NULL;
+static JNIEnv* g_env = NULL;   // 创建时保存, 避免再次 GetEnv 失败
 static char g_lastError[1024] = "";
 
 /// 在 jreHome 目录里定位 libjvm.dylib (兼容几种常见布局)
@@ -80,6 +81,7 @@ static int createJVM(NSString* jreHome, NSArray<NSString*>* options)
     for (NSUInteger i = 0; i < n; ++i) free(storage[i]);
     free(storage);
 
+    if (rc == JNI_OK && g_vm != NULL) g_env = env;
     if (rc != JNI_OK || g_vm == NULL) {
         snprintf(g_lastError, sizeof(g_lastError), "JNI_CreateJavaVM 失败 rc=%d", (int)rc);
         g_vm = NULL;
@@ -92,10 +94,11 @@ static int createJVM(NSString* jreHome, NSArray<NSString*>* options)
 static NSString* runMain(NSString* mainClass, NSArray<NSString*>* args)
 {
     if (g_vm == NULL) return @"JVM 未创建";
-    JNIEnv* env = NULL;
-    if ((*g_vm)->GetEnv(g_vm, (void**)&env, JNI_VERSION_1_8) != JNI_OK || env == NULL) {
-        return @"JVM 环境获取失败";
+    JNIEnv* env = g_env;
+    if (env == NULL && (*g_vm)->GetEnv(g_vm, (void**)&env, JNI_VERSION_1_8) != JNI_OK) {
+        env = NULL;
     }
+    if (env == NULL) return @"JVM 环境获取失败";
     // JNI 的 FindClass 需要斜杠分隔 (com/xcl/smoke/Smoke), 不能直接用点
     NSString* slashName = [mainClass stringByReplacingOccurrencesOfString:@"." withString:@"/"];
     jclass cls = (*env)->FindClass(env, slashName.UTF8String);
