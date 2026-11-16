@@ -57,7 +57,7 @@ struct ContentView: View {
     @State private var launching = false
     @State private var runtimeLog: [String] = []
 
-    private let versions = ["26.3 · 原版", "1.21.1 · 原版", "1.20.1 · 原版"]
+    private let versions = ["1.8.9 · 原版", "1.12.2 · 原版", "1.16.5 · 原版"]
 
     var body: some View {
         HStack(spacing: 0) {
@@ -214,7 +214,7 @@ struct ContentView: View {
                 Card {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("状态").font(.system(size: 13, weight: .bold)).foregroundColor(Theme.text)
-                        statusRow("运行层", "未接入（iOS 需 Java 8 Zero）", false)
+                        statusRow("运行层", JvmRuntime.shared.ready ? "JVM 已就绪 (Java 8)" : "未接入（iOS 需 Java 8 Zero）", JvmRuntime.shared.ready)
                         statusRow("图形层", "待接入 Metal", false)
                         statusRow("界面外壳", "原生 SwiftUI · 横屏", true)
                         statusRow("设备", deviceInfo, true)
@@ -430,10 +430,10 @@ struct ContentView: View {
         if launching { return }
         launching = true
         runtimeLog = []
-        alertText = "正在启动 Java 虚拟机并连接版本清单…\n\n首次约 15–40 秒（OpenJDK 8 Zero 解释器 + 网络）"
+        alertText = "正在下载 \(currentVersionId) 到 iPad…\n\nJava 8 Zero 环境下可运行 1.8.9 / 1.12.2 / 1.16.5\n首次约 60–150 MB，视网络可能 3–15 分钟"
         showAlert = true
         DispatchQueue.global(qos: .userInitiated).async {
-            let result = JvmRuntime.shared.runEngine()
+            let result = JvmRuntime.shared.runInstall(versionId: self.currentVersionId)
             DispatchQueue.main.async {
                 self.launching = false
                 self.runtimeLog = JvmRuntime.shared.lines

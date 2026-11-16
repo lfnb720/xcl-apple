@@ -20,6 +20,12 @@ final class JvmRuntime {
         return d
     }
 
+    var gameDir: String {
+        let d = tmpDir + "/game"
+        try? FileManager.default.createDirectory(atPath: d, withIntermediateDirectories: true)
+        return d
+    }
+
     private func add(_ s: String) {
         lines.append(s)
         if lines.count > 600 { lines.removeFirst(lines.count - 600) }
@@ -27,15 +33,14 @@ final class JvmRuntime {
 
     func resetLog() { lines.removeAll() }
 
-    /// 创建 JVM (两个 jar 一次放进 classpath, 因为 JVM 启动后不能再改)
     private func ensureJVM() -> String {
         if ready { return "ok" }
         add("[iOS] JRE: \(jreHome)")
 
         let fm = FileManager.default
         guard fm.fileExists(atPath: jreHome + "/lib") else {
-            add("[错误] 包里没有 jre8/lib —— 构建时 JRE 没打包成功")
-            return "缺少 iOS JRE（构建脚本未打包）"
+            add("[错误] 包里没有 jre8/lib")
+            return "缺少 iOS JRE"
         }
         add("[iOS] smoke.jar: \(fm.fileExists(atPath: smokeJar))")
         add("[iOS] engine.jar: \(fm.fileExists(atPath: engineJar))")
@@ -59,7 +64,6 @@ final class JvmRuntime {
         return r
     }
 
-    /// JVM 冒烟: 执行 com.xcl.smoke.Smoke
     func runSmoke() -> String {
         let r0 = ensureJVM()
         guard r0 == "ok" else { return "JVM 创建失败：\(r0)" }
@@ -79,14 +83,13 @@ final class JvmRuntime {
         return "JVM 已创建，Smoke 未通过：\(r)\n\n\(output)"
     }
 
-    /// 引擎联网测试: 执行 com.xcl.engine.IosBoot (版本清单 + 安装计划)
     func runEngine() -> String {
         let r0 = ensureJVM()
         guard r0 == "ok" else { return "JVM 创建失败：\(r0)" }
 
         let outFile = tmpDir + "/engine.txt"
         try? FileManager.default.removeItem(atPath: outFile)
-        let args = outFile + "\n" + tmpDir + "/game"
+        let args = outFile + "\n" + gameDir
         let r = String(cString: xcl_jvm_run_main("com.xcl.engine.IosBoot", args))
         add("[iOS] 执行 IosBoot: \(r)")
 
@@ -97,6 +100,28 @@ final class JvmRuntime {
         if r == "ok" && output.contains("engine.smoke=ok") {
             return "引擎联网成功 ✅\n\n" + output
         }
-        return "引擎执行结果：\(r)\n\n\(output.isEmpty ? "（无输出，可能是网络或 classpath 问题）" : output)"
+        return "引擎执行结果：\(r)\n\n\(output)"
+    }
+
+    /// 下载指定版本的全部文件到沙盒 (IosInstall)
+    func runInstall(versionId: String) -> String {
+        let r0 = ensureJVM()
+        guard r0 == "ok" else { return "JVM 创建失败：\(r0)" }
+
+        let outFile = tmpDir + "/install.txt"
+        try? FileManager.default.removeItem(atPath: outFile)
+        let args = outFile + "\n" + gameDir + "\n" + versionId
+        add("[iOS] 开始安装 \(versionId) → \(gameDir)")
+        let r = String(cString: xcl_jvm_run_main("com.xcl.engine.IosInstall", args))
+        add("[iOS] IosInstall 返回: \(r)")
+
+        var output = ""
+        if let s = try? String(contentsOfFile: outFile, encoding: .utf8) { output = s }
+        for line in output.split(separator: "\n") { add("[Java] \(line)") }
+
+        if r == "ok" && output.contains("install.ok=1") {
+            return "下载完成 ✅\n\n" + output
+        }
+        return "安装结果：\(r)\n\n\(output.isEmpty ? "（无输出）" : output)"
     }
 }
