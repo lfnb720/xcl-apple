@@ -59,6 +59,11 @@ struct ContentView: View {
 
     private let versions = ["1.8.9 · 原版", "1.12.2 · 原版", "1.16.5 · 原版"]
 
+    /// 当前选中的版本号 (如 1.8.9), 供下载/启动使用
+    private var currentVersionId: String {
+        versions[versionIndex].components(separatedBy: " ").first ?? "1.8.9"
+    }
+
     var body: some View {
         HStack(spacing: 0) {
             sidebar
