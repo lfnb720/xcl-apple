@@ -224,13 +224,25 @@ struct ContentView: View {
                         statusRow("界面外壳", "原生 SwiftUI · 横屏", true)
                         statusRow("设备", deviceInfo, true)
 
-                        Button(action: runJvmSmoke) {
-                            Text(launching ? "运行中…" : "JVM 自检")
-                                .font(.system(size: 11.5, weight: .semibold))
-                                .padding(.horizontal, 12).padding(.vertical, 6)
-                                .background(Theme.bg).cornerRadius(8)
-                                .foregroundColor(Theme.text)
-                        }.buttonStyle(.plain).disabled(launching)
+                        HStack(spacing: 8) {
+                            Button(action: runJvmSmoke) {
+                                Text(launching ? "运行中…" : "JVM 自检")
+                                    .font(.system(size: 11.5, weight: .semibold))
+                                    .padding(.horizontal, 12).padding(.vertical, 6)
+                                    .background(Theme.bg).cornerRadius(8)
+                                    .foregroundColor(Theme.text)
+                            }.buttonStyle(.plain).disabled(launching)
+
+                            Button(action: launchMinecraft) {
+                                Text(launching ? "启动中…" : "启动 MC")
+                                    .font(.system(size: 11.5, weight: .semibold))
+                                    .padding(.horizontal, 12).padding(.vertical, 6)
+                                    .background(Theme.accent.opacity(0.15)).cornerRadius(8)
+                                    .foregroundColor(Theme.accent)
+                            }.buttonStyle(.plain).disabled(launching)
+                        }
+
+                        Color.clear.frame(height: 2)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -448,6 +460,23 @@ struct ContentView: View {
         }
     }
 
+    private func launchMinecraft() {
+        if launching { return }
+        launching = true
+        runtimeLog = []
+        alertText = "正在启动 Minecraft \(currentVersionId)…\n\n会先加载 LWJGL/iOS 图形层，预期会报错（这正是下一步要补的）"
+        showAlert = true
+        let ver = currentVersionId
+        DispatchQueue.global(qos: .userInitiated).async {
+            let result = JvmRuntime.shared.runLaunch(versionId: ver, player: self.playerName)
+            DispatchQueue.main.async {
+                self.launching = false
+                self.runtimeLog = JvmRuntime.shared.lines
+                self.alertText = result
+                self.showAlert = true
+            }
+        }
+    }
     private func runJvmSmoke() {
         if launching { return }
         launching = true

@@ -103,6 +103,31 @@ final class JvmRuntime {
         return "引擎执行结果：\(r)\n\n\(output)"
     }
 
+    /// 尝试启动 Minecraft 主类 (IosLaunch)
+    func runLaunch(versionId: String, player: String) -> String {
+        let r0 = ensureJVM()
+        guard r0 == "ok" else { return "JVM 创建失败：\(r0)" }
+
+        let outFile = tmpDir + "/launch.txt"
+        try? FileManager.default.removeItem(atPath: outFile)
+        let args = outFile + "\n" + gameDir + "\n" + versionId + "\n" + player
+        add("[iOS] 启动 \(versionId) (player=\(player))")
+        let r = String(cString: xcl_jvm_run_main("com.xcl.engine.IosLaunch", args))
+        add("[iOS] IosLaunch 返回: \(r)")
+
+        var output = ""
+        if let s = try? String(contentsOfFile: outFile, encoding: .utf8) { output = s }
+        let tail = output.split(separator: "\n").suffix(160).joined(separator: "\n")
+        for line in tail.split(separator: "\n") { add("[Java] \(line)") }
+
+        if output.contains("main returned normally") {
+            return "MC 主类执行完毕（异常）"
+        }
+        if !output.isEmpty {
+            return "启动尝试结果\n\n" + tail
+        }
+        return "启动结果：\(r)（无输出）"
+    }
     /// 下载指定版本的全部文件到沙盒 (IosInstall)
     func runInstall(versionId: String) -> String {
         let r0 = ensureJVM()
