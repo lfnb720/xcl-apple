@@ -11,6 +11,8 @@
 #import <OpenGLES/ES2/glext.h>
 #import <QuartzCore/QuartzCore.h>
 #import <jni.h>
+#include <stdio.h>
+#include <string.h>
 
 static EAGLContext* g_ctx = NULL;
 static GLuint g_fbo = 0;
