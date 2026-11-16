@@ -15,6 +15,9 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.xcl.iosgl
+        PRODUCT_NAME: XCLIOSGL
+        GENERATE_INFOPLIST_FILE: YES
+        DEFINES_MODULE: NO
         HEADER_SEARCH_PATHS: "$(SRCROOT)/XCL/include"
         OTHER_LDFLAGS: "-framework OpenGLES -framework QuartzCore -framework UIKit"
 
