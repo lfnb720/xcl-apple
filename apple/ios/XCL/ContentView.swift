@@ -218,6 +218,14 @@ struct ContentView: View {
                         statusRow("图形层", "待接入 Metal", false)
                         statusRow("界面外壳", "原生 SwiftUI · 横屏", true)
                         statusRow("设备", deviceInfo, true)
+
+                        Button(action: runJvmSmoke) {
+                            Text(launching ? "运行中…" : "JVM 自检")
+                                .font(.system(size: 11.5, weight: .semibold))
+                                .padding(.horizontal, 12).padding(.vertical, 6)
+                                .background(Theme.bg).cornerRadius(8)
+                                .foregroundColor(Theme.text)
+                        }.buttonStyle(.plain).disabled(launching)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -422,7 +430,24 @@ struct ContentView: View {
         if launching { return }
         launching = true
         runtimeLog = []
-        alertText = "正在启动 Java 虚拟机…\n\n首次初始化约 10–30 秒（OpenJDK 8 Zero 解释器）"
+        alertText = "正在启动 Java 虚拟机并连接版本清单…\n\n首次约 15–40 秒（OpenJDK 8 Zero 解释器 + 网络）"
+        showAlert = true
+        DispatchQueue.global(qos: .userInitiated).async {
+            let result = JvmRuntime.shared.runEngine()
+            DispatchQueue.main.async {
+                self.launching = false
+                self.runtimeLog = JvmRuntime.shared.lines
+                self.alertText = result
+                self.showAlert = true
+            }
+        }
+    }
+
+    private func runJvmSmoke() {
+        if launching { return }
+        launching = true
+        runtimeLog = []
+        alertText = "正在执行 JVM 自检…"
         showAlert = true
         DispatchQueue.global(qos: .userInitiated).async {
             let result = JvmRuntime.shared.runSmoke()

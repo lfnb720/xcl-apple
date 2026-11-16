@@ -17,6 +17,8 @@ targets:
         buildPhase: resources
       - path: Resources/smoke.jar
         buildPhase: resources
+      - path: Resources/xcl-engine.jar
+        buildPhase: resources
     info:
       path: XCL/Info.plist
       properties:
