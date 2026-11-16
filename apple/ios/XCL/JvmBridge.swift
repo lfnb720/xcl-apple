@@ -13,6 +13,10 @@ final class JvmRuntime {
     private var jreHome: String { Bundle.main.resourcePath.map { $0 + "/jre8" } ?? "" }
     private var smokeJar: String { Bundle.main.resourcePath.map { $0 + "/smoke.jar" } ?? "" }
     private var engineJar: String { Bundle.main.resourcePath.map { $0 + "/xcl-engine.jar" } ?? "" }
+    private var shimJar: String { Bundle.main.resourcePath.map { $0 + "/xcl-shim.jar" } ?? "" }
+    private var glFramework: String {
+        (Bundle.main.privateFrameworksPath ?? "") + "/XCLIOSGL.framework/XCLIOSGL"
+    }
 
     private var tmpDir: String {
         let d = NSTemporaryDirectory() + "xcl"
@@ -45,8 +49,10 @@ final class JvmRuntime {
         add("[iOS] smoke.jar: \(fm.fileExists(atPath: smokeJar))")
         add("[iOS] engine.jar: \(fm.fileExists(atPath: engineJar))")
 
-        var cp = smokeJar
-        if fm.fileExists(atPath: engineJar) { cp += ":" + engineJar }
+        var cp = ""
+        if fm.fileExists(atPath: shimJar) { cp = shimJar }
+        if fm.fileExists(atPath: smokeJar) { cp += (cp.isEmpty ? "" : ":") + smokeJar }
+        if fm.fileExists(atPath: engineJar) { cp += (cp.isEmpty ? "" : ":") + engineJar }
 
         let opts = [
             "-Djava.home=\(jreHome)",
@@ -110,7 +116,7 @@ final class JvmRuntime {
 
         let outFile = tmpDir + "/launch.txt"
         try? FileManager.default.removeItem(atPath: outFile)
-        let args = outFile + "\n" + gameDir + "\n" + versionId + "\n" + player
+        let args = outFile + "\n" + gameDir + "\n" + versionId + "\n" + player + "\n" + glFramework + "\n" + shimJar
         add("[iOS] 启动 \(versionId) (player=\(player))")
         let r = String(cString: xcl_jvm_run_main("com.xcl.engine.IosLaunch", args))
         add("[iOS] IosLaunch 返回: \(r)")

@@ -6,12 +6,23 @@ options:
   createIntermediateGroups: true
 
 targets:
+  # 图形层: EAGL + OpenGL ES (JNI 实现)
+  XCLIOSGL:
+    type: framework
+    platform: iOS
+    sources:
+      - path: shim/native/XclIOSGL.m
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.xcl.iosgl
+        HEADER_SEARCH_PATHS: "$(SRCROOT)/XCL/include"
+        OTHER_LDFLAGS: "-framework OpenGLES -framework QuartzCore -framework UIKit"
+
   XCL:
     type: application
     platform: iOS
     sources:
       - path: XCL
-      # JRE 与冒烟 jar 作为文件夹/文件资源打进 App 根目录
       - path: Resources/jre8
         type: folder
         buildPhase: resources
@@ -19,6 +30,11 @@ targets:
         buildPhase: resources
       - path: Resources/xcl-engine.jar
         buildPhase: resources
+      - path: Resources/xcl-shim.jar
+        buildPhase: resources
+    dependencies:
+      - target: XCLIOSGL
+        embed: true
     info:
       path: XCL/Info.plist
       properties:
