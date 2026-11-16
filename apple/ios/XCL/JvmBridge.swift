@@ -123,16 +123,28 @@ final class JvmRuntime {
 
         var output = ""
         if let s = try? String(contentsOfFile: outFile, encoding: .utf8) { output = s }
-        let tail = output.split(separator: "\n").suffix(160).joined(separator: "\n")
-        for line in tail.split(separator: "\n") { add("[Java] \(line)") }
+        let raw = output.split(separator: "\n").map(String.init)
+        for line in raw.suffix(200) { add("[Java] \(line)") }
 
         if output.contains("main returned normally") {
             return "MC 主类执行完毕（异常）"
         }
-        if !output.isEmpty {
-            return "启动尝试结果\n\n" + tail
+
+        // 只挑关键行, 避免 classpath 噪声淹没报错
+        var key: [String] = []
+        for line in raw {
+            if line.contains("EXCEPTION") || line.contains("Caused by")
+                || line.hasPrefix("[Display]") || line.hasPrefix("[Sys]")
+                || line.contains("IosGL") || line.contains("ngl")
+                || line.contains("UnsatisfiedLink") || line.contains("NoClassDefFound")
+                || line.contains("ClassNotFound") || line.contains("gameArgs=")
+                || line.contains("SecurityManager") {
+                key.append(line)
+            }
         }
-        return "启动结果：\(r)（无输出）"
+        if key.isEmpty { key = Array(raw.suffix(25)) }
+        let merged = Array((key + ["---- 末尾 ----"] + raw.suffix(15)).suffix(70))
+        return "启动尝试结果\n\n" + merged.joined(separator: "\n")
     }
     /// 下载指定版本的全部文件到沙盒 (IosInstall)
     func runInstall(versionId: String) -> String {
